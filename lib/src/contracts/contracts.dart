@@ -1,0 +1,24 @@
+import 'package:ensdart/src/errors/contracts.dart';
+import 'package:ensdart/src/interfaces/contract_interface_base.dart';
+import 'package:http/http.dart' as http;
+import 'package:web3dart/web3dart.dart';
+
+part 'add_ens_contracts.dart';
+part 'base_registrar.dart';
+part 'dns_registrar.dart';
+part 'eth_registrar_controller.dart';
+part 'name_wrapper.dart';
+part 'oldest_resolver.dart';
+part 'public_resolver.dart';
+part 'registry.dart';
+part 'universal_resolver.dart';
+part 'bulk_renewal.dart';
+part 'dnssec_impl.dart';
+part 'multicall.dart';
+part 'erc165.dart';
+part 'erc721.dart';
+part 'erc1155.dart';
+part 'constants.dart';
+part 'reverse_registrar.dart';
+part 'old_resolver.dart';
+part 'get_chain_contract_address.dart';
