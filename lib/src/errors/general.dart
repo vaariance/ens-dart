@@ -1,6 +1,4 @@
-import 'base.dart';
-
-import '../types.dart';
+part of 'errors.dart';
 
 class AdditionalParameterSpecifiedError extends BaseError {
   final String parameter;

@@ -1,4 +1,4 @@
-import 'base.dart';
+part of 'errors.dart';
 
 class UnsupportedNetworkError extends BaseError {
   final String network;

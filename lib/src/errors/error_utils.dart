@@ -1,6 +1,4 @@
-import 'dart:io';
-
-import 'package:pubspec_yaml/pubspec_yaml.dart';
+part of 'errors.dart';
 
 class Version {
   final String version;

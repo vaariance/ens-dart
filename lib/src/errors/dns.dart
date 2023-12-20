@@ -1,4 +1,4 @@
-import 'base.dart';
+part of 'errors.dart';
 
 class DnsResponseStatusError extends BaseError {
   final String responseStatus;

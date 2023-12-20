@@ -1,4 +1,4 @@
-import 'package:ensdart/src/errors/contracts.dart';
+import 'package:ensdart/src/errors/errors.dart';
 import 'package:ensdart/src/interfaces/contract_interface_base.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';

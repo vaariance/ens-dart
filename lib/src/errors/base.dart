@@ -1,7 +1,7 @@
-import 'error_utils.dart';
+part of 'errors.dart';
 
 class BaseError extends Error {
-  late String details;
+  late String? details;
   late List<String?> metaMessages;
   String shortMessage;
 
@@ -15,13 +15,14 @@ class BaseError extends Error {
   }) {
     final causeDetails = parameters.cause is BaseError
         ? parameters.cause?.details
-        : parameters.cause?.message ?? parameters.details!;
+        : parameters.cause?.message ?? parameters.details;
 
     message = [
       shortMessage,
       '',
       if (parameters.metaMessages.isNotEmpty) ...parameters.metaMessages,
-      if (causeDetails.isNotEmpty) 'Details: $causeDetails',
+      if (causeDetails != null && causeDetails.isNotEmpty)
+        'Details: $causeDetails',
       'Version: $version',
     ].join('\n');
 
