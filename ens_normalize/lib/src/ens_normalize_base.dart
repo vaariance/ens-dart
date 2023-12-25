@@ -1,6 +1,3 @@
-// TODO: Put public facing types in this file.
+import 'dart:math';
 
-/// Checks if you are awesome. Spoiler: you are.
-class Awesome {
-  bool get isAwesome => true;
-}
+part 'utils.dart';

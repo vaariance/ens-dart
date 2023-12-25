@@ -1,4 +1,4 @@
-import 'dart:math';
+part of 'ens_normalize_base.dart';
 
 String hexCp(int cp) {
   validCodePoint(cp);

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ens_normalize/src/utils.dart';
+import 'package:ens_normalize/ens_normalize.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
