@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+// import 'package:ens_normalize/src/ens_normalize_base.dart' show compareArrays;
+
 const MAX_LINEAR = 251;
 
 Map<String, dynamic> bestArithmetic(Iterable<int> symbols, {int max = 128}) {
@@ -159,7 +161,8 @@ List<List<T>> splitBetween<T>(List<T> v, bool Function(T a, T b) fn) {
   return ret;
 }
 
-Map<String, List<List>> splitLinear(List<dynamic> mapped, num dx, num dy) {
+Map<String, List<List<dynamic>>> splitLinear(
+    List<dynamic> mapped, num dx, num dy) {
   List<List<dynamic>> linear = [];
 
   if (mapped.isEmpty) {
@@ -259,6 +262,57 @@ class Encoder {
     values.add(x);
   }
 
+  // // Todo: add _sortMap function
+  // void writeMapped(List<List<int>> linearSpecs, List<List<dynamic>> mapped) {
+  //   Map<int, List<List<dynamic>>> newMap =
+  //       groupBy<List<dynamic>, int>(mapped, (ys) => ys[1].length, ret: {})
+  //           .map((k, v) => _sortMap(k, v));
+
+  //   for (List<int> spec in linearSpecs) {
+  //     int w;
+  //     int dx;
+  //     int dy;
+  //     [w, dx, dy] = spec;
+
+  //     if (!(dx > 0)) throw ArgumentError('expected positive dx: $dx');
+  //     if (w >= newMap.length) {
+  //       print("linear spec not used: out of bounds: $w");
+  //       continue;
+  //     }
+
+  //     final split = splitLinear(newMap[w]!, dx, dy);
+  //     List<List<dynamic>> linear = split["linear"]!;
+  //     List<List<dynamic>> nonlinear = split["nolinear"]!;
+
+  //     if (linear.isEmpty) {
+  //       print("linear spec not used: empty: $w $dx $dy");
+  //       continue;
+  //     }
+
+  //     newMap[w] = nonlinear;
+  //     unsigned(w);
+  //     positive(dx);
+  //     unsigned(dy);
+
+  //     for (var v in linear) {
+  //       unsigned(v[1]);
+  //     }
+  //     unsigned(0);
+  //     // writeTransposed(linear.map(([x, _, ys]) => [x, ...ys]).sort(compare_arrays));
+  //   }
+
+  //   unsigned(0); // eol
+
+  //   newMap.forEach((w, m) {
+  //     if (m.isEmpty) return;
+  //     unsigned(1 + w);
+  //     positive(m.length);
+  //     //writeTransposed(m.map(([x, ys]) => [x, ...ys]).sort(compare_arrays));
+  //   });
+
+  //   unsigned(0); // eol
+  // }
+
   void writeMember(Iterable<int> v) {
     if (v is Set) {
       v = [...v];
@@ -277,6 +331,14 @@ class Encoder {
     }
     unsigned(0);
     unsigned(0);
+  }
+
+  void writeTransposed(List<List<int>> m) {
+    if (m.isEmpty) return;
+    int w = m[0].length;
+    for (int i = 0; i < w; i++) {
+      deltas(m.map((v) => v[i]));
+    }
   }
 
   void _checkUnsigned(List<int> values) {
