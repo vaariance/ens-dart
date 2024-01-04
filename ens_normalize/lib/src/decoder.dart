@@ -1,6 +1,10 @@
 import 'dart:typed_data';
 
-Iterable<int> decodeArithmetic(List<int> bytes) {
+List<int> decodeArithmetic(List<int> bytes) {
+  if ((bytes.length & 7) != 0) {
+    bytes.addAll(List.filled(8 - (bytes.length & 7), 0));
+  }
+
   int pos = 0;
   int u16() {
     return (bytes[pos++] << 8) | bytes[pos++];
@@ -42,7 +46,7 @@ Iterable<int> decodeArithmetic(List<int> bytes) {
   int low = 0;
   int range = FULL;
   while (true) {
-    int value = ((((register - low + 1) * total) - 1) / range).floor();
+    int value = (((register - low + 1) * total - 1) / range).floor();
     int start = 0;
     int end = symbolCount;
     while (end - start > 1) {
@@ -55,8 +59,8 @@ Iterable<int> decodeArithmetic(List<int> bytes) {
     }
     if (start == 0) break;
     symbols.add(start);
-    int a = low + (range * acc[start] / total).floor();
-    int b = low + (range * acc[start + 1] / total).floor() - 1;
+    int a = low + ((range * acc[start]) / total).floor();
+    int b = low + ((range * acc[start + 1]) / total).floor() - 1;
     while (((a ^ b) & HALF) == 0) {
       register = (register << 1) & MASK | readBit();
       a = (a << 1) & MASK;
@@ -89,74 +93,75 @@ Iterable<int> decodeArithmetic(List<int> bytes) {
       default:
         return x - 1;
     }
-  });
+  }).toList();
 }
 
-List readArrayWhile(Function next) {
-  final v = <dynamic>[];
+List<T> readArrayWhile<T>(T? Function() next) {
+  final v = <T>[];
   while (true) {
-    final x = next(v.length);
-    if (x == null) break;
+    final x = next();
+    if (x == null || x == 0) break;
     v.add(x);
   }
   return v;
 }
 
-List<int> readAscending(int n, int Function() next) {
+List<int> readAscending(int n, int? Function() next) {
   int x = -1;
-  List<int> v = List<int>.generate(n, (i) => x += 1 + next());
+  List<int> v = List<int>.generate(n, (i) => x += 1 + next()!);
   return v;
 }
 
-int Function() readCompressedPayload(String s) {
-  return readPayload(decodeArithmetic(unsafeAtob(s)) as List<int>);
+int? Function() readCompressedPayload(String s) {
+  return readPayload(decodeArithmetic(unsafeAtob(s)));
 }
 
-List<int> readCounts(int n, int Function() next) {
-  List<int> v = List<int>.generate(n, (i) => 1 + next());
+List<int> readCounts(int n, int? Function() next) {
+  List<int> v = List<int>.generate(n, (i) => 1 + next()!);
   return v;
 }
 
-List<int> readDeltas(int n, int Function({dynamic opt}) next) {
+List<int> readDeltas(int n, int? Function() next) {
   int x = 0;
   List<int> v = List<int>.generate(n, (i) => x += signed(next()));
   return v;
 }
 
-List<List<dynamic>> readLinearTable(int w, Function next) {
-  final dx = 1 + next();
-  final dy = next();
+List<List<dynamic>> readLinearTable(int w, int? Function() next) {
+  final dx = 1 + next()!;
+  final dy = next()!;
   final vN = readArrayWhile(next);
-  final m =
-      readTransposed(vN.length, 1 + w, next as int Function({dynamic opt}));
+  final m = readTransposed(vN.length, 1 + w, next);
   return m.expand((v) {
     final x = v[0];
     final ys = v.sublist(1);
-    return List.generate(vN[vN.indexOf(v)], (j) {
+    return List.generate(vN[m.lastIndexOf(v)], (j) {
       final jDy = j * dy;
       return [x + j * dx, ys.map((y) => y + jDy).toList()];
     });
   }).toList();
 }
 
-List<dynamic> readMapped(int Function({dynamic opt}) next) {
-  List<List<List<int>>> ret = [];
+List<dynamic> readMapped(int? Function() next) {
+  List<List<List<dynamic>>> ret = [];
   while (true) {
-    int w = next();
+    int? w = next();
     if (w == 0) break;
-    ret.add(readLinearTable(w, next) as List<List<int>>);
+    if (w != null) {
+      ret.add(readLinearTable(w, next));
+    }
   }
   while (true) {
-    int w = next() - 1;
-    if (w < 0) break;
-    ret.add(readReplacementTable(w, next));
+    int? w = next(); // Handle potential null from next()
+    if (w == null || w - 1 < 0) break;
+    ret.add(readReplacementTable(w - 1, next));
   }
   return ret.flat();
 }
 
-List<int> readMemberArray(int Function() next, List<int> lookup) {
-  List<int> v = readAscending(next(), next);
-  int n = next();
+List<int> readMemberArray(int? Function() next, List<int> lookup) {
+  List<int> v = readAscending(next()!, next);
+  int n = next()!;
   List<int> vX = readAscending(n, next);
   List<int> vN = readCounts(n, next);
   for (int i = 0; i < n; i++) {
@@ -167,24 +172,24 @@ List<int> readMemberArray(int Function() next, List<int> lookup) {
   return lookup.isNotEmpty ? v.map((x) => lookup[x]).toList() : v;
 }
 
-int Function() readPayload(List<int> v) {
+T? Function() readPayload<T>(List<T> v) {
   int pos = 0;
-  return () => v[pos++];
+  return () => pos < v.length ? v[pos++] : null;
 }
 
-List<List<int>> readReplacementTable(int w, int Function({dynamic opt}) next) {
-  int n = 1 + next();
+List<List<dynamic>> readReplacementTable(int w, int? Function() next) {
+  int n = 1 + next()!;
   List<List<int>> m = readTransposed(n, 1 + w, next);
-  return m.map((v) => [v[0], v.sublist(1)] as List<int>).toList();
+  return m.map((v) => [v[0], v.sublist(1)]).toList();
 }
 
-List<int> readSorted(int Function() next, [int prev = 0]) {
+List<int> readSorted(int? Function() next, [int prev = 0]) {
   List<int> ret = [];
   while (true) {
-    int x = next();
-    int n = next();
-    if (n == 0) break;
-    prev += x;
+    int? x = next();
+    int? n = next();
+    if (n == null) break;
+    prev += x ?? 0;
     for (int i = 0; i < n; i++) {
       ret.add(prev + i);
     }
@@ -193,15 +198,15 @@ List<int> readSorted(int Function() next, [int prev = 0]) {
   return ret;
 }
 
-List<List<int>> readSortedArrays(int Function() next) {
-  List<int> readArrayInternal(int length) {
-    return readSorted(next);
-  }
-
-  return readArrayWhile(readArrayInternal) as List<List<int>>;
+List<List<int>> readSortedArrays(int? Function() next) {
+  return readArrayWhile<List<int>>(() {
+    final v = readSorted(next);
+    if (v.isNotEmpty) return v;
+    return null;
+  });
 }
 
-List<List<int>> readTransposed(int n, int w, int Function({dynamic opt}) next) {
+List<List<int>> readTransposed(int n, int w, int? Function() next) {
   final m = List.generate(n, (_) => <int>[]);
   for (int i = 0; i < w; i++) {
     readDeltas(n, next).forEachIndexed((x, index) => m[index].add(x));
@@ -209,26 +214,31 @@ List<List<int>> readTransposed(int n, int w, int Function({dynamic opt}) next) {
   return m;
 }
 
-List<List<String>> readTrie(int Function() next) {
-  List<List<String>> ret = List.empty();
+List<List<int>> readTrie(int? Function() next) {
+  List<List<int>> ret = [];
   List<int> sorted = readSorted(next);
 
   Map<String, dynamic> decode(List<int> Q) {
     final S = next();
     final B = readArrayWhile(() {
-      final cps = readSorted(next).map((i) => sorted[i]).toList();
-      if (cps.isNotEmpty) return decode(cps);
+      final codePoints = readSorted(next).map((i) => sorted[i]).toList();
+      if (codePoints.isNotEmpty) return decode(codePoints);
     });
     return {'S': S, 'B': B, 'Q': Q};
   }
 
-  void expand(Map<String, dynamic> node, List<String> cps, {String? saved}) {
-    if (node['S'] & 4 != 0 && saved == cps.last) return;
-    if (node['S'] & 2 != 0) saved = cps.last;
-    if (node['S'] & 1 != 0) ret.add(cps);
-    for (final br in node['B']) {
-      for (final cp in br['Q']) {
-        expand(br, [...cps, cp], saved: saved);
+  void expand(Map<String, dynamic> node, List<int> codePoints, {int? saved}) {
+    int? S = node['S'];
+    bool sN = S != null;
+    if (sN && S & 4 != 0 && saved == codePoints.last) return;
+    if (sN && S & 2 != 0) saved = codePoints.last;
+    if (sN && S & 1 != 0) ret.add(codePoints);
+
+    List<Map<String, dynamic>> B = node['B'];
+    for (final br in B) {
+      List<int> Q = br['Q'];
+      for (final codePoint in Q) {
+        expand(br, [...codePoints, codePoint], saved: saved);
       }
     }
   }
@@ -237,11 +247,15 @@ List<List<String>> readTrie(int Function() next) {
   return ret;
 }
 
-int signed(int i) {
-  return (i & 1) != 0 ? (~i >> 1) : (i >> 1);
+int signed(int? i) {
+  return i == null
+      ? 0
+      : (i & 1) != 0
+          ? (~i >> 1)
+          : (i >> 1);
 }
 
-Uint8List unsafeAtob(String s) {
+List<int> unsafeAtob(String s) {
   List<int> lookup = List.filled(256, 0);
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
       .runes
@@ -260,34 +274,21 @@ Uint8List unsafeAtob(String s) {
     }
   }
 
-  return ret;
+  return List.from(ret);
 }
 
 extension ArrayExtensions<T> on List<T> {
-  List<T> flat({int level = 1}) {
-    final result = <T>[];
+  List flat({int level = 1}) {
+    final result = [];
     _flatten(this, result, level);
     return result;
   }
 
-  List<R> flatMap<R>(R Function(T element) mapper) {
-    final result = <R>[];
-    for (final element in this) {
-      final mapped = mapper(element);
-      if (mapped is Iterable<R>) {
-        result.addAll(mapped);
-      } else {
-        result.add(mapped);
-      }
-    }
-    return result;
-  }
-
-  void _flatten<K extends List<T>?>(List<T>? list, List<T> result, int level) {
+  void _flatten(List? list, List result, int level) {
     if (list == null) return;
     for (final item in list) {
       if (item is List && level > 0) {
-        _flatten(item as K, result, level - 1);
+        _flatten(item, result, level - 1);
       } else {
         result.add(item);
       }

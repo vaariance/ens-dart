@@ -1,14 +1,14 @@
 name: ens_normalize
-description: A starting point for Dart libraries or applications.
+description: Ethereum Name Service (ENS) Name Normalizer based on adraffy/ens-normalize.js.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/vaariance/ens-dart
 
 environment:
   sdk: ^3.1.5
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  unorm_dart: ^0.3.0
 
 dev_dependencies:
   lints: ^2.0.0

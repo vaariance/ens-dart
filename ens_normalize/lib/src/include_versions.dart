@@ -1,3 +1,5 @@
+part of 'ens_normalize_base.dart';
+
 // see: https://github.com/adraffy/ens-normalize.js#security
 const derived = "2023-09-06T06:00:29.074Z";
 const unicode = "15.1.0 (2023-09-06T02:58:19.261Z)";

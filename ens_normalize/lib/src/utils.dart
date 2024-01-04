@@ -1,35 +1,35 @@
 part of 'ens_normalize_base.dart';
 
-String hexCp(int cp) {
-  validCodePoint(cp);
-  return cp.toRadixString(16).toUpperCase().padLeft(2, '0');
+String hexCodePoint(int codePoint) {
+  validCodePoint(codePoint);
+  return codePoint.toRadixString(16).toUpperCase().padLeft(2, '0');
 }
 
-String quoteCp(int cp) {
-  String hexCode = hexCp(cp);
+String quoteCodePoint(int codePoint) {
+  String hexCode = hexCodePoint(codePoint);
   return "{$hexCode}";
 }
 
-void validCodePoint(int cp) {
-  assert(cp >= 0 && cp <= 1114111);
+void validCodePoint(int codePoint) {
+  assert(codePoint >= 0 && codePoint <= 1114111);
 }
 
-Runes explodeCp(String s) {
+Runes explodeCodePoint(String s) {
   return s.runes;
 }
 
-String strFromCps(List<int> cps) {
+String strFromCodePoints(List<int> codePoints) {
   const chunk = 4096;
-  int len = cps.length;
+  int len = codePoints.length;
 
   if (len < chunk) {
-    return String.fromCharCodes(cps);
+    return String.fromCharCodes(codePoints);
   }
 
   StringBuffer result = StringBuffer();
 
   for (int i = 0; i < len; i += chunk) {
-    result.write(String.fromCharCodes(cps.skip(i).take(chunk)));
+    result.write(String.fromCharCodes(codePoints.skip(i).take(chunk)));
   }
 
   return result.toString();
