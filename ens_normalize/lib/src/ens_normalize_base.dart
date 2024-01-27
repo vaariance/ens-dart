@@ -44,7 +44,7 @@ late NormalizationData NORMALIZATION;
 
 final simpleNameRegex = RegExp(r'^[a-z0-9]+(?:\.[a-z0-9]+)*$');
 
-final specJsonGzPath = "${Directory.current.path}/spec.json.gz";
+final specJsonZippedPath = "${Directory.current.path}/spec.json.gz";
 
 List<Token> collapseValidTokens(List<Token> tokens) {
   var out = <Token>[];
@@ -738,9 +738,9 @@ void validCodePoint(int codePoint) {
   assert(codePoint >= 0 && codePoint <= 1114111);
 }
 
-NormalizationData _decodeAndParseGzippedJson(String path) {
-  List<int> gz = File(path).absolute.readAsBytesSync();
-  List<int> decompress = gzip.decode(gz);
+NormalizationData _decodeAndParseZippedJson(String path) {
+  List<int> zipped = File(path).absolute.readAsBytesSync();
+  List<int> decompress = gzip.decode(zipped);
   String decoded = utf8.decode(decompress);
   return NormalizationData.fromJson(decoded);
 }
@@ -748,7 +748,7 @@ NormalizationData _decodeAndParseGzippedJson(String path) {
 void _isolateEntry(dynamic message) {
   final SendPort sendPort = message[0];
   final String path = message[1];
-  final result = _decodeAndParseGzippedJson(path);
+  final result = _decodeAndParseZippedJson(path);
   sendPort.send(result);
 }
 
@@ -1059,7 +1059,7 @@ class ENSNormalize {
   }
 
   static Future<void> _initialize() async {
-    await loadNormalizationDataJson(specJsonGzPath);
+    await loadNormalizationDataJson(specJsonZippedPath);
     _initialized = true;
   }
 

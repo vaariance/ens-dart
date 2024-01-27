@@ -1,4 +1,3 @@
-import 'package:ens_normalize/ens_normalize.dart';
 import 'package:test/test.dart';
 
 void main() {

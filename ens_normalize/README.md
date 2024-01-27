@@ -8,7 +8,7 @@
 
 ## Contraints
 
-Uses Dart Isolates to parse `NORMALIZATION` in a separate thread. Causing the use of `Future` for asynchronously declaring the base class.
+Uses Dart Isolates to spawn `NORMALIZATION` in a separate thread. Causing the use of `Future` for asynchronously declaring the base class.
 
 ## Getting started
 
