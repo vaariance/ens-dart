@@ -3,4 +3,5 @@
 /// More dartdocs go here.
 library;
 
-export 'src/ens_normalize_base.dart';
+export 'src/ens_normalize_base.dart'
+    show ENSNormalize, DisallowedSequence, CurableSequence;

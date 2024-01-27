@@ -1,3 +1,3 @@
 ## 1.0.0
 
-- Initial version.
+- Adapted initial version based on python implementation from namehash labs.
