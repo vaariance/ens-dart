@@ -21,7 +21,7 @@ const TESTS_URL =
   "https://raw.githubusercontent.com/adraffy/ens-normalize.js/" +
   COMMIT_HASH +
   "/validate/tests.json";
-const TESTS_PATH = "../tests/ens-normalize-tests.json";
+const TESTS_PATH = "../test/ens-normalize-tests.json";
 
 function parse_whole_map(whole_map) {
   const new_whole_map = {};

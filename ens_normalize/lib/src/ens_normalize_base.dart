@@ -46,6 +46,7 @@ final simpleNameRegex = RegExp(r'^[a-z0-9]+(?:\.[a-z0-9]+)*$');
 
 final specJsonZippedPath = "${Directory.current.path}/spec.json.gz";
 
+/// Combine cps from continuous valid tokens into single tokens.
 List<Token> collapseValidTokens(List<Token> tokens) {
   var out = <Token>[];
   var i = 0;
@@ -69,6 +70,7 @@ List<Token> collapseValidTokens(List<Token> tokens) {
   return out;
 }
 
+/// Compute the set of valid codepoints from the spec.json file.
 Set<int> computeValid(List<Map<String, dynamic>> groups) {
   var valid = <int>{};
   for (var g in groups) {
@@ -82,6 +84,7 @@ bool cpsRequiresCheck(List<int> cps) {
   return cps.any((cp) => NORMALIZATION.nfcCheck.contains(cp));
 }
 
+/// Create a lookup table for recreating FE0F emojis from non-FE0F emojis.
 Map<String, String> createEmojiFe0fLookup(List<String> emojis) {
   var lookup = HashMap<String, String>();
   for (var emoji in emojis) {
@@ -141,6 +144,7 @@ Tuple2<List<Map<String, dynamic>>?, CurableSequence?> determineGroup(
   return Tuple2(groups, null);
 }
 
+/// Recursively convert dictionary keys to integers (for JSON parsing).
 dynamic dictKeysToInt(dynamic d) {
   if (d is Map) {
     return {for (var key in d.keys) tryStrToInt(key): dictKeysToInt(d[key])};
@@ -148,6 +152,7 @@ dynamic dictKeysToInt(dynamic d) {
   return d;
 }
 
+/// Recursively convert dictionary keys to string (for JSON parsing).
 dynamic dictKeysToString(dynamic d) {
   if (d is Map) {
     return {for (var key in d.keys) tryIntToStr(key): dictKeysToString(d[key])};
@@ -155,10 +160,12 @@ dynamic dictKeysToString(dynamic d) {
   return d;
 }
 
+/// Remove all FE0F from text.
 String filterFe0f(String text) {
   return text.replaceAll('\uFE0F', '');
 }
 
+/// Find the index of a group by name.
 int? findGroupId(List<Map<dynamic, dynamic>> groups, String name) {
   for (var i = 0; i < groups.length; i++) {
     if (groups[i]['name'] == name) {
@@ -212,6 +219,7 @@ List<NormalizableSequence> findNormalizations(List<Token> tokens) {
   return warnings;
 }
 
+/// Convert group names to group ids in the whole_map for faster lookup.
 Map<int, dynamic> groupNamesToIds(
     List<Map<String, dynamic>> groups, Map<int, dynamic> wholeMap) {
   for (var v in wholeMap.values) {
@@ -228,11 +236,7 @@ Map<int, dynamic> groupNamesToIds(
   return wholeMap;
 }
 
-String hexCodePoint(int codePoint) {
-  validCodePoint(codePoint);
-  return codePoint.toRadixString(16).toUpperCase().padLeft(2, '0');
-}
-
+/// Loads `NormalizationData` from a zip file.
 Future<void> loadNormalizationDataJson(String zipPath) async {
   final receivePort = ReceivePort();
   await Isolate.spawn(_isolateEntry, [receivePort.sendPort, zipPath]);
@@ -259,6 +263,7 @@ CurableSequence makeFencedError(List<int> cps, int start, int end) {
   );
 }
 
+/// Create metadata for the CONF_MIXED error.
 Map<String, String> metaForConfMixed(Map<String, dynamic> g, int cp) {
   List? s1 = NORMALIZATION.groups
       .where((group) => group['V'].contains(cp))
@@ -281,22 +286,36 @@ Map<String, String> metaForConfMixed(Map<String, dynamic> g, int cp) {
   }
 }
 
+/// applies the specified Unicode Normalization Form to a list of codepoints
+/// and returns the result as a `Runes`
 Runes nf(List<int> codePoints, String form) {
   return strToCodePoints(strFromCodePoints(codePoints).normalize(form: form));
 }
 
+/// applies the NFC Unicode Normalization to a list of codepoints
+/// and returns the result as a `Runes`
 Runes nfc(List<int> codePoints) {
   return nf(codePoints, 'NFC');
 }
 
+/// applies the NFD Unicode Normalization to a list of codepoints
+/// and returns the result as a `Runes`
 Runes nfd(List<int> codePoints) {
   return nf(codePoints, 'NFD');
 }
 
+/// applies the specified Unicode Normalization to a list of codepoints
+/// and returns the result as a `string`
 String nfPartial(List<int> codePoints, String form) {
   return String.fromCharCodes(codePoints).normalize(form: form);
 }
 
+/// https://github.com/namehash/ens-normalize-python/blob/main/ens_normalize/normalization.py
+///
+///  This function returns a list of [Token] objects that describe the modifications applied by ENS normalization to the input string.
+///
+/// Args:
+///   tokens (List<Token>): A list of Token objects.
 List<Token> normalizeTokens(List<Token> tokens) {
   var i = 0;
   var start = -1;
@@ -323,8 +342,7 @@ List<Token> normalizeTokens(List<Token> tokens) {
           for (var tok in slice)
             if (tok.type == TY_VALID || tok.type == TY_MAPPED) ...tok.cps
         ];
-        var str0 =
-            strFromCodePoints(cps); // Todo: use String.fromCharCodes(cps)
+        var str0 = strFromCodePoints(cps);
         var str = str0.normalize();
         if (str0 == str) {
           i = end - 1;
@@ -345,6 +363,8 @@ List<Token> normalizeTokens(List<Token> tokens) {
   return collapseValidTokens(tokens);
 }
 
+/// Output of post_check() is not input aligned.
+///  This function offsets the error index (in-place) to match the input characters.
 void offsetErrStart(CurableSequence? err, List<Token> tokens) {
   if (err == null) {
     return;
@@ -628,11 +648,7 @@ DisallowedSequence? postCheckWhole(
   return null;
 }
 
-String quoteCodePoint(int codePoint) {
-  String hexCode = hexCodePoint(codePoint);
-  return "{$hexCode}";
-}
-
+///  Read and parse the groups field from the spec.json file.
 List<Map<String, dynamic>> readGroups(List<Map<String, dynamic>> groups) {
   return groups.map((g) {
     return {
@@ -645,6 +661,7 @@ List<Map<String, dynamic>> readGroups(List<Map<String, dynamic>> groups) {
   }).toList();
 }
 
+/// Convert a list of integer codepoints to string.
 String strFromCodePoints(List<int> codePoints) {
   const chunk = 4096;
   int len = codePoints.length;
@@ -662,6 +679,7 @@ String strFromCodePoints(List<int> codePoints) {
   return result.toString();
 }
 
+/// Convert text to a list of integer codepoints.
 Runes strToCodePoints(String s) {
   return s.runes;
 }
@@ -734,10 +752,6 @@ dynamic tryStrToInt(x) {
   }
 }
 
-void validCodePoint(int codePoint) {
-  assert(codePoint >= 0 && codePoint <= 1114111);
-}
-
 NormalizationData _decodeAndParseZippedJson(String path) {
   List<int> zipped = File(path).absolute.readAsBytesSync();
   List<int> decompress = gzip.decode(zipped);
@@ -752,6 +766,7 @@ void _isolateEntry(dynamic message) {
   sendPort.send(result);
 }
 
+///  An unnormalized sequence containing a normalization suggestion that is automatically applied using `cure`.
 class CurableSequence extends DisallowedSequence {
   int index;
   final String sequence;
@@ -821,6 +836,7 @@ abstract class CurableSequenceTypeBase extends DisallowedSequenceTypeBase {
   CurableSequenceTypeBase(super.generalInfo, this.sequenceInfo);
 }
 
+/// An unnormalized sequence without any normalization suggestion.
 class DisallowedSequence implements Exception {
   final DisallowedSequenceTypeBase type;
   final Map<String, String> meta;
@@ -868,18 +884,15 @@ class ENSNormalize {
 
   ENSNormalize._internal();
 
-  static Future<ENSNormalize> getInstance() async {
-    _initialized == false ? await _initialize() : null;
-    return ENSNormalize._internal();
-  }
-
-  void requireInitialized() {
-    if (!_initialized) {
-      throw Exception('NORMALIZATION not initialized');
-    }
-  }
-
-  String ensBeautify(String text) {
+  /// Apply ENS normalization with beautification to a string.
+  ///
+  /// Raises `DisallowedSequence` if the input cannot be normalized.
+  /// e.g
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  /// String beautified = ensn.beautify('1⃣2⃣.eth'); // 1️⃣2️⃣.eth
+  /// ```
+  String beautify(String text) {
     var res = ensProcess(text, doBeautify: true);
     if (res.error != null) {
       throw res.error!;
@@ -887,26 +900,49 @@ class ENSNormalize {
     return res.beautified!;
   }
 
-  String ensCure(String text) {
-    return _ensCure(text).item1;
+  /// Apply ENS normalization to a string. If the result is not normalized then this function
+  ///  will try to make the input normalized by removing all disallowed characters.
+
+  ///  Raises `DisallowedSequence` if one is encountered and cannot be cured.
+  /// e.g
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  /// String normalized = ensn.cure('Ni‍ck?.ETH'); // nick.eth
+  /// ```
+  String cure(String text) {
+    return _cure(text).item1;
   }
 
-  List<NormalizableSequence> ensNormalizations(String input) {
-    var res = ensProcess(input, doNormalizations: true);
-    if (res.error != null) {
-      throw res.error!;
-    }
-    return res.normalizations!;
-  }
-
-  String ensNormalize(String text) {
-    var res = ensProcess(text, doNormalize: true);
-    if (res.error != null) {
-      throw res.error!;
-    }
-    return res.normalized!;
-  }
-
+  /// Used to compute
+  ///
+  ///  - `ens_normalize`
+  ///  - `ens_beautify`
+  ///  - `ens_tokenize`
+  ///  - `ens_normalizations`
+  ///  - `ens_cure`
+  ///  in one go.
+  ///
+  ///  Returns `ENSProcessResult` with the following fields:
+  ///  - `normalized`: normalized name or `None` if input cannot be normalized or `do_normalize` is `False`
+  ///  - `beautified`: beautified name or `None` if input cannot be normalized or `do_beautify` is `False`
+  ///  - `tokens`: list of `Token` objects or `None` if `do_tokenize` is `False`
+  ///  - `cured`: cured name or `None` if input cannot be cured or `do_cure` is `False`
+  ///  - `cures`: list of fixed `CurableSequence` objects or `None` if input cannot be cured or `do_cure` is `False`
+  ///  - `error`: `DisallowedSequence` or `CurableSequence` or `None` if input is valid
+  ///  - `normalizations`: list of `NormalizableSequence` objects or `None` if `do_normalizations` is `False`
+  /// e.g
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  ///  ensn.ensProcess(
+  ///     "Nàme🧙‍♂️1⃣.eth",
+  ///     doNormalize: true,
+  ///     doBeautify: true,
+  ///     doTokenize: true,
+  ///     doNormalizations: true,
+  ///     doCure: true,
+  ///   );
+  ///  // Instance of 'ENSProcessResult'
+  ///  ```
   ENSProcessResult ensProcess(
     String input, {
     bool doNormalize = false,
@@ -915,7 +951,7 @@ class ENSNormalize {
     bool doNormalizations = false,
     bool doCure = false,
   }) {
-    requireInitialized();
+    _requireInitialized();
     if (simpleNameRegex.hasMatch(input)) {
       List<Token>? tokens;
       if (doTokenize) {
@@ -1035,7 +1071,7 @@ class ENSNormalize {
     List<CurableSequence>? cures;
     if (doCure) {
       try {
-        var result = _ensCure(input);
+        var result = _cure(input);
         cured = result.item1;
         cures = result.item2;
       } on DisallowedSequence {
@@ -1054,29 +1090,112 @@ class ENSNormalize {
     );
   }
 
-  List<Token> ensTokenize(String input) {
-    return ensProcess(input, doTokenize: true).tokens!;
-  }
-
-  static Future<void> _initialize() async {
-    await loadNormalizationDataJson(specJsonZippedPath);
-    _initialized = true;
-  }
-
-  bool isEnsNormalizable(String name) {
+  /// Checks if the input string is ENS normalizable
+  /// (i.e. `normalize(name)` will not raise `DisallowedSequence`).
+  /// e.g
+  ///
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  /// ensn.isNormalizable('Nick.ETH'); // true
+  /// ```
+  bool isNormalizable(String name) {
     return ensProcess(name).error == null;
   }
 
-  bool isEnsNormalized(String name) {
+  /// Checks if the input string is already ENS normalized
+  /// (i.e. `ens_normalize(name) == name`).
+  /// e.g
+  ///
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  /// ensn.isNormalized('Nick.ETH'); // true
+  ///```
+  bool isNormalized(String name) {
     return ensProcess(name, doNormalize: true).normalized == name;
   }
 
-  Tuple2<String, List<CurableSequence>> _ensCure(String text) {
-    requireInitialized();
+  /// This function returns a list of [NormalizableSequence] objects
+  ///  that describe the modifications applied by ENS normalization to the input string.
+
+  ///  Raises `DisallowedSequence` if the input cannot be normalized.
+  /// e.g
+  ///
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  /// List<NormalizableSequence> normalizations = ensn.normalizations(text);
+  /// // [
+  // // NormalizableSequence(code="NormalizableSequenceType", index=0, sequence="N", suggested="n"),
+  // // NormalizableSequence(code="NormalizableSequenceType", index=1, sequence="🧙‍♂️", suggested="🧙‍♂")
+  // // ]
+  /// ```
+  List<NormalizableSequence> normalizations(String input) {
+    var res = ensProcess(input, doNormalizations: true);
+    if (res.error != null) {
+      throw res.error!;
+    }
+    return res.normalizations!;
+  }
+
+  /// Apply ENS normalization to a string.
+  ///
+  ///  Raises DisallowedSequence if the input cannot be normalized.
+  /// e.g
+  /// ```dart
+  /// ENSNormalize ensn = await ENSNormalize.getInstance();
+  /// String normalized = ensn.normalize('Nick.ETH');
+  /// // nick.eth
+  /// ```
+  String normalize(String text) {
+    var res = ensProcess(text, doNormalize: true);
+    if (res.error != null) {
+      throw res.error!;
+    }
+    return res.normalized!;
+  }
+
+  /// Tokenize a string using ENS normalization.
+
+  ///  Returns a list of tokens.
+
+  ///  Each token contains a `type` field and other fields depending on the type.
+  ///  All codepoints are represented as integers.
+  ///
+  /// Token types and their fields:
+  ///  - valid
+  ///     - cps: list of codepoints
+  ///  - mapped
+  ///     - cp: input codepoint
+  ///  - cps: list of output codepoints
+  ///     - ignored
+  ///     - cp: codepoint
+  ///  - disallowed
+  ///     - cp: codepoint
+  ///  - emoji
+  ///     - emoji: 'pretty' version of the emoji codepoints (with FE0F)
+  ///     - input: raw input codepoints
+  ///     - cps: text version of the emoji codepoints (without FE0F)
+  ///  - stop:
+  ///     - cp: 0x2E
+  ///  - nfc
+  ///     - input: input codepoints
+  ///     - cps: output codepoints (after NFC normalization)
+  ///
+  /// e.g
+  ///
+  /// ```dart
+  ///    ENSNormalize ensn = await ENSNormalize.getInstance();
+  ///    var tokens = ensn.tokenize('Nàme‍🧙‍♂.eth');
+  /// ```
+  List<Token> tokenize(String input) {
+    return ensProcess(input, doTokenize: true).tokens!;
+  }
+
+  Tuple2<String, List<CurableSequence>> _cure(String text) {
+    _requireInitialized();
     var cures = <CurableSequence>[];
     for (var i = 0; i < 2 * text.length + 1; i++) {
       try {
-        return Tuple2(ensNormalize(text), cures);
+        return Tuple2(normalize(text), cures);
       } on CurableSequence catch (e) {
         text = text.substring(0, e.index) +
             e.suggested +
@@ -1086,6 +1205,22 @@ class ENSNormalize {
     }
     throw DisallowedSequence(DisallowedSequenceType(
         'ens_cure() exceeded max iterations. Please report this as a bug along with the input string.'));
+  }
+
+  void _requireInitialized() {
+    if (!_initialized) {
+      throw Exception('NORMALIZATION not initialized');
+    }
+  }
+
+  static Future<ENSNormalize> getInstance() async {
+    _initialized == false ? await _initialize() : null;
+    return ENSNormalize._internal();
+  }
+
+  static Future<void> _initialize() async {
+    await loadNormalizationDataJson(specJsonZippedPath);
+    _initialized = true;
   }
 }
 
@@ -1108,6 +1243,7 @@ class ENSProcessResult {
       this.normalizations});
 }
 
+/// An unnormalized sequence containing a normalization suggestion that is automatically applied using `normalize` and `cure`.
 class NormalizableSequence extends CurableSequence {
   NormalizableSequence(
       {required NormalizableSequenceType type,

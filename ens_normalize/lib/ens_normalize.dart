@@ -4,4 +4,11 @@
 library;
 
 export 'src/ens_normalize_base.dart'
-    show ENSNormalize, DisallowedSequence, CurableSequence;
+    show
+        ENSNormalize,
+        DisallowedSequence,
+        DisallowedSequenceType,
+        CurableSequence,
+        CurableSequenceType,
+        NormalizableSequence,
+        NormalizableSequenceType;
