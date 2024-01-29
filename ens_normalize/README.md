@@ -6,10 +6,6 @@
 * [Javascript reference implementation](https://github.com/adraffy/ens-normalize.js).
 * Adapted from [JavaScript implementation version 1.9.0](https://github.com/adraffy/ens-normalize.js/tree/562d3f6d8cf28caf042d7163e3aa522dfcd925dc) and [Python implementation version 3.0.7](https://github.com/namehash/ens-normalize-python/tree/0f93e5b06c55eeaac9d046a4c9696cb968af4fc5).
 
-## Contraints
-
-Uses Dart Isolates to spawn `NORMALIZATION` in a separate thread. Causing the use of `Future` for asynchronously declaring the base class.
-
 ## Getting started
 
 ```sh
@@ -23,7 +19,9 @@ import 'package:ens_normalize/ens_normalize.dart';
 
 
 void main() async {
-  ENSNormalize ensn = await ENSNormalize.getInstance();
+  ENSNormalize ensn = await ENSNormalize.getInstance(); // parses normalization in separate Isolate
+  // OR
+  ENSNormalize ensn = ENSNormalize(); // Passes normalization synchronously
 
   ensn.normalize('Nick.ETH');
   // nick.eth

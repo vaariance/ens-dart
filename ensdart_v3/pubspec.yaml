@@ -1,19 +1,19 @@
 name: ensdart
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+description: Ethereum name service (ENS) dart library based on ensjs_v3
+version: 0.0.1
+repository: https://github.com/vaariance/ens-dart
 
 environment:
   sdk: ^3.1.5
 
 # Add regular dependencies here.
 dependencies:
+  ens_normalize: ^1.0.1
+  hive: ^2.2.3
   http: ^1.1.0
   pubspec_yaml: ^3.1.0
   web3dart: ^2.7.2
-  ens_normalize:
-    path: ../ens_normalize
 
 dev_dependencies:
-  lints: ^2.0.0
+  lints: ^3.0.0
   test: ^1.21.0

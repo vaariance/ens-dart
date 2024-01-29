@@ -1,21 +1,22 @@
 import 'package:ens_normalize/ens_normalize.dart';
 
 void main() async {
-  ENSNormalize ensn = await ENSNormalize.getInstance();
+  ENSNormalize ensn = ENSNormalize();
 
-  ensn.normalize('Nick.ETH');
-  // nick.eth
+  final normalized = ensn.normalize('Nick.ETH');
+  print(normalized); // nick.eth
 
-  ensn.isNormalizable('Nick.ETH');
-  // true
+  final isNormalizable = ensn.isNormalizable('Nick.ETH');
+  print(isNormalizable); // true
 
-  ensn.cure('Ni‍ck?.ETH');
-  // nick.eth
+  final cured = ensn.cure('Ni‍ck?.ETH');
+  print(cured); // nick.eth
 
-  ensn.beautify('1⃣2⃣.eth');
-  // 1️⃣2️⃣.eth
+  final beautified = ensn.beautify('1⃣2⃣.eth');
+  print(beautified); // 1️⃣2️⃣.eth
 
-  ensn.tokenize('Nàme‍🧙‍♂.eth');
+  final tokens = ensn.tokenize('Nàme‍🧙‍♂.eth');
+  print(tokens);
   // [
   // Instance of 'TokenMapped',
   // Instance of 'TokenNFC',
@@ -25,13 +26,14 @@ void main() async {
   // Instance of 'TokenStop',
   // Instance of 'TokenValid']
 
-  ensn.normalizations('Nàme🧙‍♂️.eth');
+  final normalizations = ensn.normalizations('Nàme🧙‍♂️.eth');
+  print(normalizations);
   // [
   // NormalizableSequence(code="NormalizableSequenceType", index=0, sequence="N", suggested="n"),
   // NormalizableSequence(code="NormalizableSequenceType", index=1, sequence="🧙‍♂️", suggested="🧙‍♂")
   // ]
 
-  ensn.ensProcess(
+  final ensProcessResult = ensn.ensProcess(
     "Nàme🧙‍♂️1⃣.eth",
     doNormalize: true,
     doBeautify: true,
@@ -39,5 +41,5 @@ void main() async {
     doNormalizations: true,
     doCure: true,
   );
-  // Instance of 'ENSProcessResult'
+  print(ensProcessResult); // Instance of 'ENSProcessResult'
 }

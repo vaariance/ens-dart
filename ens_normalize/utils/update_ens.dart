@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ens_normalize/src/ens_normalize_base.dart';
+import 'package:ens_normalize/src/normalization.dart';
 
 final specJsonPath = '${Directory.current.path}/spec.json';
 final indexJsPath =
@@ -15,16 +15,16 @@ void addWholeMapExport() {
   File(indexJsPath).writeAsStringSync(content);
 }
 
-void generateZip() {
-  var data = NormalizationData.fromSpecJsonPath(specJsonPath);
-  List<int> encoded = utf8.encode(data.toJson());
-  List<int> compressed = gzip.encode(encoded);
-  File('../lib/src/spec.json.gz').writeAsBytesSync(compressed);
+void generate() {
+  final data = NORMALIZATION.fromSpecJsonPath(specJsonPath);
+  final spec = base64Url.encode(utf8.encode(jsonEncode(data.toJson())));
+  File('../lib/src/spec.dart')
+      .writeAsStringSync('const String spec = \'$spec\';');
 }
 
 void main() {
   Process.runSync('pnpm', ['install']);
   addWholeMapExport();
   Process.runSync('node', ['update-ens.js']);
-  generateZip();
+  generate();
 }
