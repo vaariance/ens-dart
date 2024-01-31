@@ -23,6 +23,7 @@ _$NORMALIZATIONImpl _$$NORMALIZATIONImplFromJson(Map<String, dynamic> json) =>
       fenced: (json['fenced'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(int.parse(k), e as String),
       ),
+      escape: (json['escape'] as List<dynamic>).map((e) => e as int).toList(),
       groups: (json['groups'] as List<dynamic>)
           .map((e) => Group.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -45,6 +46,7 @@ Map<String, dynamic> _$$NORMALIZATIONImplToJson(_$NORMALIZATIONImpl instance) =>
       'emoji': instance.emoji,
       'nfcCheck': instance.nfcCheck.toList(),
       'fenced': instance.fenced.map((k, e) => MapEntry(k.toString(), e)),
+      'escape': instance.escape,
       'groups': instance.groups,
       'valid': instance.valid.toList(),
       'wholeMap': const WholeMapConverter().toJson(instance.wholeMap),

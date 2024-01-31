@@ -8,7 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  ens_normalize: ^1.0.1
+  ens_normalize: ^1.0.2
   hive: ^2.2.3
   http: ^1.1.0
   pubspec_yaml: ^3.1.0

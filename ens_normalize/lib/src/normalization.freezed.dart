@@ -27,6 +27,7 @@ mixin _$NORMALIZATION {
   List<List<int>> get emoji => throw _privateConstructorUsedError;
   Set<int> get nfcCheck => throw _privateConstructorUsedError;
   Map<int, String> get fenced => throw _privateConstructorUsedError;
+  List<int> get escape => throw _privateConstructorUsedError;
   List<Group> get groups => throw _privateConstructorUsedError;
   Set<int> get valid => throw _privateConstructorUsedError;
   @WholeMapConverter()
@@ -57,6 +58,7 @@ abstract class $NORMALIZATIONCopyWith<$Res> {
       List<List<int>> emoji,
       Set<int> nfcCheck,
       Map<int, String> fenced,
+      List<int> escape,
       List<Group> groups,
       Set<int> valid,
       @WholeMapConverter() Map<int, dynamic> wholeMap,
@@ -86,6 +88,7 @@ class _$NORMALIZATIONCopyWithImpl<$Res, $Val extends NORMALIZATION>
     Object? emoji = null,
     Object? nfcCheck = null,
     Object? fenced = null,
+    Object? escape = null,
     Object? groups = null,
     Object? valid = null,
     Object? wholeMap = null,
@@ -123,6 +126,10 @@ class _$NORMALIZATIONCopyWithImpl<$Res, $Val extends NORMALIZATION>
           ? _value.fenced
           : fenced // ignore: cast_nullable_to_non_nullable
               as Map<int, String>,
+      escape: null == escape
+          ? _value.escape
+          : escape // ignore: cast_nullable_to_non_nullable
+              as List<int>,
       groups: null == groups
           ? _value.groups
           : groups // ignore: cast_nullable_to_non_nullable
@@ -171,6 +178,7 @@ abstract class _$$NORMALIZATIONImplCopyWith<$Res>
       List<List<int>> emoji,
       Set<int> nfcCheck,
       Map<int, String> fenced,
+      List<int> escape,
       List<Group> groups,
       Set<int> valid,
       @WholeMapConverter() Map<int, dynamic> wholeMap,
@@ -198,6 +206,7 @@ class __$$NORMALIZATIONImplCopyWithImpl<$Res>
     Object? emoji = null,
     Object? nfcCheck = null,
     Object? fenced = null,
+    Object? escape = null,
     Object? groups = null,
     Object? valid = null,
     Object? wholeMap = null,
@@ -235,6 +244,10 @@ class __$$NORMALIZATIONImplCopyWithImpl<$Res>
           ? _value._fenced
           : fenced // ignore: cast_nullable_to_non_nullable
               as Map<int, String>,
+      escape: null == escape
+          ? _value._escape
+          : escape // ignore: cast_nullable_to_non_nullable
+              as List<int>,
       groups: null == groups
           ? _value._groups
           : groups // ignore: cast_nullable_to_non_nullable
@@ -278,6 +291,7 @@ class _$NORMALIZATIONImpl implements _NORMALIZATION {
       required final List<List<int>> emoji,
       required final Set<int> nfcCheck,
       required final Map<int, String> fenced,
+      required final List<int> escape,
       required final List<Group> groups,
       required final Set<int> valid,
       @WholeMapConverter() required final Map<int, dynamic> wholeMap,
@@ -291,6 +305,7 @@ class _$NORMALIZATIONImpl implements _NORMALIZATION {
         _emoji = emoji,
         _nfcCheck = nfcCheck,
         _fenced = fenced,
+        _escape = escape,
         _groups = groups,
         _valid = valid,
         _wholeMap = wholeMap,
@@ -350,6 +365,14 @@ class _$NORMALIZATIONImpl implements _NORMALIZATION {
     return EqualUnmodifiableMapView(_fenced);
   }
 
+  final List<int> _escape;
+  @override
+  List<int> get escape {
+    if (_escape is EqualUnmodifiableListView) return _escape;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_escape);
+  }
+
   final List<Group> _groups;
   @override
   List<Group> get groups {
@@ -399,7 +422,7 @@ class _$NORMALIZATIONImpl implements _NORMALIZATION {
 
   @override
   String toString() {
-    return 'NORMALIZATION(unicodeVersion: $unicodeVersion, ignored: $ignored, mapped: $mapped, cm: $cm, emoji: $emoji, nfcCheck: $nfcCheck, fenced: $fenced, groups: $groups, valid: $valid, wholeMap: $wholeMap, nsmMax: $nsmMax, nsm: $nsm, emojiFe0fLookup: $emojiFe0fLookup, emojiRegex: $emojiRegex)';
+    return 'NORMALIZATION(unicodeVersion: $unicodeVersion, ignored: $ignored, mapped: $mapped, cm: $cm, emoji: $emoji, nfcCheck: $nfcCheck, fenced: $fenced, escape: $escape, groups: $groups, valid: $valid, wholeMap: $wholeMap, nsmMax: $nsmMax, nsm: $nsm, emojiFe0fLookup: $emojiFe0fLookup, emojiRegex: $emojiRegex)';
   }
 
   @override
@@ -415,6 +438,7 @@ class _$NORMALIZATIONImpl implements _NORMALIZATION {
             const DeepCollectionEquality().equals(other._emoji, _emoji) &&
             const DeepCollectionEquality().equals(other._nfcCheck, _nfcCheck) &&
             const DeepCollectionEquality().equals(other._fenced, _fenced) &&
+            const DeepCollectionEquality().equals(other._escape, _escape) &&
             const DeepCollectionEquality().equals(other._groups, _groups) &&
             const DeepCollectionEquality().equals(other._valid, _valid) &&
             const DeepCollectionEquality().equals(other._wholeMap, _wholeMap) &&
@@ -437,6 +461,7 @@ class _$NORMALIZATIONImpl implements _NORMALIZATION {
       const DeepCollectionEquality().hash(_emoji),
       const DeepCollectionEquality().hash(_nfcCheck),
       const DeepCollectionEquality().hash(_fenced),
+      const DeepCollectionEquality().hash(_escape),
       const DeepCollectionEquality().hash(_groups),
       const DeepCollectionEquality().hash(_valid),
       const DeepCollectionEquality().hash(_wholeMap),
@@ -468,6 +493,7 @@ abstract class _NORMALIZATION implements NORMALIZATION {
           required final List<List<int>> emoji,
           required final Set<int> nfcCheck,
           required final Map<int, String> fenced,
+          required final List<int> escape,
           required final List<Group> groups,
           required final Set<int> valid,
           @WholeMapConverter() required final Map<int, dynamic> wholeMap,
@@ -494,6 +520,8 @@ abstract class _NORMALIZATION implements NORMALIZATION {
   Set<int> get nfcCheck;
   @override
   Map<int, String> get fenced;
+  @override
+  List<int> get escape;
   @override
   List<Group> get groups;
   @override

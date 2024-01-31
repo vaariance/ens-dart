@@ -889,6 +889,16 @@ class ENSNormalize {
 
   ENSNormalize._internal();
 
+  bool shouldEscape(int codePoint) {
+    return normalizationData.escape.contains(codePoint);
+  }
+
+  bool isCombiningMark(int codePoint, bool onlyNSM) {
+    return onlyNSM
+        ? normalizationData.nsm.contains(codePoint)
+        : normalizationData.cm.contains(codePoint);
+  }
+
   /// Apply ENS normalization with beautification to a string.
   ///
   /// Raises `DisallowedSequence` if the input cannot be normalized.

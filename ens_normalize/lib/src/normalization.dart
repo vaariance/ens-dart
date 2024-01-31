@@ -18,6 +18,7 @@ class NORMALIZATION with _$NORMALIZATION {
     required List<List<int>> emoji,
     required Set<int> nfcCheck,
     required Map<int, String> fenced,
+    required List<int> escape,
     required List<Group> groups,
     required Set<int> valid,
     @WholeMapConverter() required Map<int, dynamic> wholeMap,
@@ -44,6 +45,7 @@ class NORMALIZATION with _$NORMALIZATION {
     var fenced = {
       for (var list in spec['fenced']) list[0] as int: list[1] as String
     };
+    var escape = List<int>.from(spec['escape']);
     var groups = readGroups(List<Map<String, dynamic>>.from(spec['groups']));
     var valid = computeValid(groups);
     var wholeMap = groupNamesToIds(
@@ -64,6 +66,7 @@ class NORMALIZATION with _$NORMALIZATION {
       emoji: emoji,
       nfcCheck: nfcCheck,
       fenced: fenced,
+      escape: escape,
       groups: groups,
       valid: valid,
       wholeMap: wholeMap,
