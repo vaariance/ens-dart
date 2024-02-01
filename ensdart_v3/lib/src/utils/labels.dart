@@ -1,7 +1,5 @@
 import 'package:ensdart/src/errors/errors.dart';
 
-import 'helpers.dart';
-
 String decodeLabelhash(String hash) {
   if (!(hash.startsWith('[') && hash.endsWith(']'))) {
     throw InvalidEncodedLabelError(
@@ -38,12 +36,6 @@ String encodeLabelhash(String hash) {
 
 bool isEncodedLabelhash(String hash) {
   return hash.startsWith('[') && hash.endsWith(']') && hash.length == 66;
-}
-
-/// TODO: remove this code
-String saveLabel(String label) {
-  final hash = labelHash(label.toLowerCase());
-  return hash;
 }
 
 String checkLabel(String hash) {

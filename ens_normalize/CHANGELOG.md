@@ -1,3 +1,11 @@
+## 1.0.5-r1
+
+- adjust ens split function to handle root, 2LD, 3LD names
+
+## 1.0.4
+
+- add ens split
+
 ## 1.0.3
 
 - add escape to Normalization class

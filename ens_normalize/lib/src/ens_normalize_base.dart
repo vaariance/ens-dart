@@ -1205,6 +1205,38 @@ class ENSNormalize {
     return ensProcess(input, doTokenize: true).tokens!;
   }
 
+  List<TokenSplit> split(String input) {
+    final tokens = tokenize(input);
+
+    List<TokenSplit> splits = [];
+    int lastStopIndex = 0;
+
+    for (var i = 0; i < tokens.length; i++) {
+      if (tokens[i].type == "stop") {
+        final out = <int>[];
+        final toks = tokens.sublist(lastStopIndex, i);
+        for (var e in toks) {
+          out.addAll(e.cps);
+        }
+        final emoji = toks.indexWhere((e) => e.type == "emoji") != -1;
+        splits.add(TokenSplit(tokens: toks, output: out, emoji: emoji));
+        lastStopIndex = i + 1;
+      }
+    }
+
+    if (lastStopIndex < tokens.length) {
+      final out = <int>[];
+      final toks = tokens.sublist(lastStopIndex);
+      for (var e in toks) {
+        out.addAll(e.cps);
+      }
+      final emoji = toks.indexWhere((e) => e.type == "emoji") != -1;
+      splits.add(TokenSplit(tokens: toks, output: out, emoji: emoji));
+    }
+
+    return splits;
+  }
+
   Tuple2<String, List<CurableSequence>> _cure(String text) {
     _requireInitialized();
     var cures = <CurableSequence>[];
@@ -1344,6 +1376,10 @@ class Token {
   final String type;
 
   const Token({this.cp, this.cps = const [], required this.type});
+
+  Map<String, dynamic> toMap() {
+    return {'cp': cp, 'cps': cps, 'type': type};
+  }
 }
 
 class TokenDisallowed extends Token {
@@ -1378,6 +1414,17 @@ class TokenStop extends Token {
 
 class TokenValid extends Token {
   TokenValid({required super.cps}) : super(type: TY_VALID);
+}
+
+class TokenSplit extends Token {
+  List<Token> tokens;
+  List<int> output;
+  bool emoji = false;
+  TokenSplit(
+      {required this.tokens,
+      required this.output,
+      this.emoji = false,
+      super.type = ""});
 }
 
 extension NormalizationExtension on String {

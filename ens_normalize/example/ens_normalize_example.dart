@@ -42,4 +42,17 @@ void main() async {
     doCure: true,
   );
   print(ensProcessResult); // Instance of 'ENSProcessResult'
+
+  final splitted = ensn.split('💩Raffy.eth_');
+  print(splitted); // [Instance of 'TokenSplit', Instance of 'TokenSplit']
+  // [{
+  //   tokens: List<Tokens>,
+  //   output: List<int>,
+  //   emoji: bool
+  // },
+  // {
+  //   tokens: List<Tokens>,
+  //   output: List<int>,
+  //   emoji: bool
+  // }]
 }

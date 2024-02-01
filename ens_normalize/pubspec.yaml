@@ -1,6 +1,6 @@
 name: ens_normalize
 description: Ethereum Name Service (ENS) Name Normalizer adapted from namehash labs and adraffy.
-version: 1.0.3
+version: 1.0.5-r1
 repository: https://github.com/vaariance/ens-dart
 
 environment:

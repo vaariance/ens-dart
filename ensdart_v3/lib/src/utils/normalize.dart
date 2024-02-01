@@ -8,6 +8,8 @@ import 'labels.dart';
 
 export 'package:ens_normalize/ens_normalize.dart';
 
+final ENSNormalize ensn = ENSNormalize();
+
 extension ENSNormalizeExtension on ENSNormalize {
   String nameHash(String name) {
     Uint8List result = Uint8List(32);
